@@ -1,7 +1,7 @@
 if [ ! -e configure -o ! -e config.h.in ]; then
 	aclocal
 	autoheader
-	automake --foreign
+	automake --foreign --add-missing
 	autoconf
 	#autoreconf --force --verbose --foreign
 fi

@@ -7,6 +7,7 @@
 VERSION=1.16
 
 VPATH=@srcdir@
+top_srcdir=@top_srcdir@
 srcdir=@srcdir@
 
 # Compiler and Linker Names
@@ -19,7 +20,8 @@ srcdir=@srcdir@
 
 # Compilation flags. Note the += does not write over the user's CFLAGS!
 # The rest of the flags come from the parent Dropbear makefile
-CFLAGS += -c -I$(srcdir)/src/headers/ -I$(srcdir)/../ -DLTC_SOURCE -I$(srcdir)/../libtommath/
+INCLUDES := -I$(srcdir)/src/headers/ -I$(srcdir)/../ -I$(srcdir)/../libtommath/
+CFLAGS = @CFLAGS@
 
 # additional warnings (newer GCC 3.4 and higher)
 ifdef GCC_34
@@ -233,7 +235,7 @@ default:library
 
 #ciphers come in two flavours... enc+dec and enc 
 src/ciphers/aes/aes_enc.o: src/ciphers/aes/aes.c src/ciphers/aes/aes_tab.c
-	$(CC) $(CFLAGS) -DENCRYPT_ONLY -c $< -o src/ciphers/aes/aes_enc.o
+	$(CC) $(CFLAGS) $(INCLUDES) -DENCRYPT_ONLY -c $< -o src/ciphers/aes/aes_enc.o
 
 #These are the rules to make certain object files.
 src/ciphers/aes/aes.o: src/ciphers/aes/aes.c src/ciphers/aes/aes_tab.c
@@ -244,6 +246,12 @@ src/hashes/sha2/sha256.o: src/hashes/sha2/sha256.c src/hashes/sha2/sha224.c
 
 #This rule makes the libtomcrypt library.
 library: $(LIBNAME)
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -c -DLTC_SOURCE -c -o $@ $<
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c -DLTC_SOURCE -c -o $@ $<
 
 testprof/$(LIBTEST): 
 	cd testprof ; CFLAGS="$(CFLAGS)" LIBTEST_S=$(LIBTEST_S) $(MAKE) 
