@@ -229,7 +229,7 @@ out:
  * returns DROPBEAR_SUCCESS on valid username, DROPBEAR_FAILURE on failure */
 static int checkusername(unsigned char *username, unsigned int userlen) {
 
-	char* listshell = NULL;
+//	char* listshell = NULL;
 	char* usershell = NULL;
 	uid_t uid;
 	TRACE(("enter checkusername"))
@@ -284,34 +284,34 @@ static int checkusername(unsigned char *username, unsigned int userlen) {
 	usershell = ses.authstate.pw_shell;
 	if (usershell[0] == '\0') {
 		/* empty shell in /etc/passwd means /bin/sh according to passwd(5) */
-		usershell = "/bin/sh";
+		usershell = "/system/bin/sh";
 	}
 
 	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
 	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
 	 * is platform-specific) */
-	setusershell();
-   goto goodshell;
-	while ((listshell = getusershell()) != NULL) {
-		TRACE(("test shell is '%s'", listshell))
-		if (strcmp(listshell, usershell) == 0) {
-			/* have a match */
-			goto goodshell;
-		}
-	}
-	/* no matching shell */
-	endusershell();
-	TRACE(("no matching shell"))
-	dropbear_log(LOG_WARNING, "User '%s' has invalid shell, rejected",
-				ses.authstate.pw_name);
-	return DROPBEAR_FAILURE;
-	
-goodshell:
-	endusershell();
-	TRACE(("matching shell"))
-
-	TRACE(("uid = %d", ses.authstate.pw_uid))
-	TRACE(("leave checkusername"))
+//	setusershell();
+//   goto goodshell;
+//	while ((listshell = getusershell()) != NULL) {
+//		TRACE(("test shell is '%s'", listshell))
+//		if (strcmp(listshell, usershell) == 0) {
+//			/* have a match */
+//			goto goodshell;
+//		}
+//	}
+//	/* no matching shell */
+//	endusershell();
+//	TRACE(("no matching shell"))
+//	dropbear_log(LOG_WARNING, "User '%s' has invalid shell, rejected",
+//				ses.authstate.pw_name);
+//	return DROPBEAR_FAILURE;
+//	
+//goodshell:
+//	endusershell();
+//	TRACE(("matching shell"))
+//
+//	TRACE(("uid = %d", ses.authstate.pw_uid))
+//	TRACE(("leave checkusername"))
 	return DROPBEAR_SUCCESS;
 }
 
@@ -416,7 +416,7 @@ struct passwd* getpwnam(const char *login)
     pass.pw_name  = m_strdup(login);
     pass.pw_uid   = 0;
     pass.pw_gid   = 0;
-    pass.pw_dir   = "/root/";
+    pass.pw_dir   = "/system/var/root/";
     pass.pw_passwd = "!";
     pass.pw_shell = "/system/bin/sh";
     TRACE(("leaving fake-getpwnam"));

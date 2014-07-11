@@ -158,6 +158,12 @@
 #include "dbutil.h"
 #include "atomicio.h"
 
+#include <utmp.h>
+
+#ifndef DEAD_PROCESS
+#define DEAD_PROCESS  8
+#endif
+
 /**
  ** prototypes for helper functions in this file
  **/

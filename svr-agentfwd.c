@@ -41,7 +41,7 @@
 #include "listener.h"
 #include "auth.h"
 
-#define AGENTDIRPREFIX "/tmp/dropbear-"
+#define AGENTDIRPREFIX "/data/local/tmp/dropbear-"
 
 static int send_msg_channel_open_agent(int fd);
 static int bindagent(int fd, struct ChanSess * chansess);

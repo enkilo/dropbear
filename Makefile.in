@@ -23,6 +23,7 @@ LIBTOM_DEPS=$(STATIC_LTC) $(STATIC_LTM)
 CFLAGS+=-I$(srcdir)/libtomcrypt/src/headers/
 LIBTOM_LIBS=$(STATIC_LTC) $(STATIC_LTM) 
 endif
+CFLAGS+=-Os
 
 COMMONOBJS=dbutil.o buffer.o \
 		dss.o bignum.o \
@@ -30,7 +31,7 @@ COMMONOBJS=dbutil.o buffer.o \
 		queue.o \
 		atomicio.o compat.o fake-rfc2553.o \
 		ltc_prng.o ecc.o ecdsa.o crypto_desc.o \
-		gensignkey.o gendss.o genrsa.o
+		gensignkey.o gendss.o genrsa.o getpass.o
 
 SVROBJS=svr-kex.o svr-auth.o sshpty.o \
 		svr-authpasswd.o svr-authpubkey.o svr-authpubkeyoptions.o svr-session.o svr-service.o \

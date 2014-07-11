@@ -13,7 +13,7 @@ ifndef IGNORE_SPEED
 CFLAGS += -O3 -funroll-loops
 
 #for size 
-#CFLAGS += -Os
+CFLAGS += -Os
 
 #x86 optimizations [should be valid for any GCC install though]
 CFLAGS  += -fomit-frame-pointer

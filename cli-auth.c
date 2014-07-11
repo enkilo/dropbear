@@ -338,8 +338,11 @@ char* getpass_or_cancel(char* prompt)
         return password;
     }
 #endif
+	char buffer[2048];
 
-	password = getpass(prompt);
+	fputs(prompt, stderr);
+	fflush(stderr);
+	password = fgets(buffer, sizeof(buffer), stdin);
 
 	/* 0x03 is a ctrl-c character in the buffer. */
 	if (password == NULL || strchr(password, '\3') != NULL) {

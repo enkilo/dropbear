@@ -35,7 +35,7 @@ CFLAGS += -O3 -funroll-loops
 CFLAGS += -fomit-frame-pointer
 
 # optimize for SIZE
-#CFLAGS += -Os -DLTC_SMALL_CODE
+CFLAGS += -Os -DLTC_SMALL_CODE
 
 endif
 
