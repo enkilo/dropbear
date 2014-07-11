@@ -7,6 +7,7 @@
 
 AC_PREREQ(2.50)
 AC_INIT(buffer.c)
+AM_INIT_AUTOMAKE
 
 OLDCFLAGS=$CFLAGS
 # Checks for programs.
