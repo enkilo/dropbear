@@ -712,6 +712,7 @@ AS_MKDIR_P(libtomcrypt/src/pk/rsa)
 AS_MKDIR_P(libtomcrypt/src/prngs)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_FILES(Makefile libtomcrypt/Makefile libtommath/Makefile)
+AC_CONFIG_SUBDIRS([sftp-server])
 AC_OUTPUT
 
 AC_MSG_NOTICE()
