@@ -163,7 +163,10 @@ AC_ARG_ENABLE(pam,
 AC_ARG_ENABLE(openpty,
 	[  --disable-openpty       Don't use openpty, use alternative method],
 	[
-		if test "x$enableval" = "xno"; then
+		if test "x$enableval" = "xforce"; then
+			AC_MSG_NOTICE(Forcing use of openpty)
+			AC_DEFINE(HAVE_OPENPTY,,[Have openpty() function])
+		elif test "x$enableval" = "xno"; then
 			AC_MSG_NOTICE(Not using openpty)
 		else
 			AC_MSG_NOTICE(Using openpty if available)

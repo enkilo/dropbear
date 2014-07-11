@@ -1,7 +1,6 @@
 if [ ! -e configure -o ! -e config.h.in ]; then
 	aclocal
 	autoheader
-	automake --foreign --add-missing
 	autoconf
 	#autoreconf --force --verbose --foreign
 fi
@@ -36,7 +35,7 @@ CPPFLAGS="$CPPFLAGS $WFLAGS" \
 	--disable-utmpx \
 	--disable-syslog \
 	--disable-lastlog \
-	--enable-openpty \
+	--enable-openpty=force \
 	--disable-shadow
 
-echo "#define HAVE_OPENPTY 1" >>config.h
+#echo "#define HAVE_OPENPTY 1" >>config.h
