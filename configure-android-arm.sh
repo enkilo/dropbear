@@ -29,3 +29,5 @@ CPPFLAGS="$CPPFLAGS $WFLAGS" \
 	--disable-lastlog \
 	--enable-openpty \
 	--disable-shadow
+
+echo "#define HAVE_OPENPTY 1" >>config.h
