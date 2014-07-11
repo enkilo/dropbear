@@ -4,7 +4,7 @@
 # invocation:
 # make PROGRAMS="dropbear dbclient scp" MULTI=1 STATIC=1 SCPPROGRESS=1
 #
-# to make a multiple-program statically linked binary "staticdropbearmulti".
+# to make a multiple-program staticall-localy linked binary "staticdropbearmulti".
 # This example will include dropbear, scp, dropbearkey, dropbearconvert, and
 # dbclient functionality, and includes the progress-bar functionality in scp.
 # Hopefully that seems intuitive.
@@ -119,12 +119,37 @@ ifeq ($(SCPPROGRESS), 1)
 	CFLAGS+=-DPROGRESS_METER
 endif
 
-all: $(TARGETS)
+SUBDIRS = sftp-server
 
-strip: $(TARGETS)
+MAKE_ARGS = \
+			AR="$(AR)" \
+			CC="$(CC)" \
+			CFLAGS="$(CFLAGS)" \
+			CPPFLAGS="$(CPPFLAGS)" \
+			HEADERS="$(HEADERS)" \
+			INSTALL="$(INSTALL)" \
+			KEYOBJS="$(KEYOBJS)" \
+			LDFLAGS="$(LDFLAGS)" \
+			LIBTOM_DEPS="$(LIBTOM_DEPS)" \
+			LIBTOM_LIBS="$(LIBTOM_LIBS)" \
+			MULTIOBJS="$(MULTIOBJS)" \
+			RANLIB="$(RANLIB)" \
+			STATIC_LTC="$(STATIC_LTC)" \
+			STATIC_LTM="$(STATIC_LTM)" \
+			STRIP="$(STRIP)"
+
+all: all-recursive
+
+all-local: $(TARGETS)
+clean: clean-recursive
+distclean: distclean-recursive
+install: install-recursive
+strip: strip-recursive
+
+strip-local: $(TARGETS)
 	$(STRIP) $(addsuffix $(EXEEXT), $(TARGETS))
 
-install: $(addprefix inst_, $(TARGETS))
+install-local: $(addprefix inst_, $(TARGETS))
 
 insmultidropbear: dropbearmulti
 	$(INSTALL) -d $(DESTDIR)$(sbindir)
@@ -200,26 +225,37 @@ $(STATIC_LTC): options.h
 $(STATIC_LTM): options.h
 	cd libtommath && $(MAKE)
 
-.PHONY : clean sizes thisclean distclean tidy ltc-clean ltm-clean
+.PHONY : clean-local sizes thisclean distclean-local tidy ltc-clean ltm-clean
 
 ltc-clean:
-	cd libtomcrypt && $(MAKE) clean
+	cd libtomcrypt && $(MAKE) clean-local
 
 ltm-clean:
-	cd libtommath && $(MAKE) clean
+	cd libtommath && $(MAKE) clean-local
 
 sizes: dropbear
 	objdump -t dropbear|grep ".text"|cut -d "." -f 2|sort -rn
 
-clean: ltc-clean ltm-clean thisclean
+clean-local: ltc-clean ltm-clean thisclean
 
 thisclean:
 	-rm -f dropbear dbclient dropbearkey dropbearconvert scp scp-progress \
 			dropbearmulti *.o *.da *.bb *.bbg *.prof 
 
-distclean: clean tidy
+distclean-local: clean-local tidy
 	-rm -f config.h
 	-rm -f Makefile
 
 tidy:
 	-rm -f *~ *.gcov */*~
+
+
+all-recursive clean-recursive distclean-recursive install-recursive strip-recursive:
+	TARGET=$(@:%-recursive=%); for DIR in $(SUBDIRS); do \
+		$(MAKE) -C $$DIR \
+			$(MAKE_ARGS) \
+		$(@:%-recursive=%); \
+	done; \
+	$(MAKE) $(MAKE_ARGS) $(@:%-recursive=%-local)
+
+
