@@ -21,10 +21,10 @@
 
 /* Default hostkey paths - these can be specified on the command line */
 #ifndef DSS_PRIV_FILENAME
-#define DSS_PRIV_FILENAME "/etc/dropbear/dropbear_dss_host_key"
+#define DSS_PRIV_FILENAME "/data/dropbear/dropbear_dss_host_key"
 #endif
 #ifndef RSA_PRIV_FILENAME
-#define RSA_PRIV_FILENAME "/etc/dropbear/dropbear_rsa_host_key"
+#define RSA_PRIV_FILENAME "/data/dropbear/dropbear_rsa_host_key"
 #endif
 #ifndef ECDSA_PRIV_FILENAME
 #define ECDSA_PRIV_FILENAME "/etc/dropbear/dropbear_ecdsa_host_key"
@@ -41,7 +41,7 @@
  * Both of these flags can be defined at once, don't compile without at least
  * one of them. */
 #define NON_INETD_MODE
-#define INETD_MODE
+#undef INETD_MODE
 
 /* Setting this disables the fast exptmod bignum code. It saves ~5kB, but is
  * perhaps 20% slower for pubkey operations (it is probably worth experimenting
@@ -55,7 +55,7 @@ much traffic. */
 #define DROPBEAR_SMALL_CODE
 
 /* Enable X11 Forwarding - server only */
-#define ENABLE_X11FWD
+#undef ENABLE_X11FWD
 
 /* Enable TCP Fowarding */
 /* 'Local' is "-L" style (client listening port forwarded via server)
@@ -175,7 +175,7 @@ much traffic. */
 
 /* Whether to print the message of the day (MOTD). This doesn't add much code
  * size */
-#define DO_MOTD
+#undef DO_MOTD
 
 /* The MOTD file path */
 #ifndef MOTD_FILENAME
@@ -192,7 +192,7 @@ much traffic. */
  * PAM challenge/response.
  * You can't enable both PASSWORD and PAM. */
 
-#define ENABLE_SVR_PASSWORD_AUTH
+#undef ENABLE_SVR_PASSWORD_AUTH
 /* PAM requires ./configure --enable-pam */
 /*#define ENABLE_SVR_PAM_AUTH */
 #define ENABLE_SVR_PUBKEY_AUTH
@@ -258,7 +258,7 @@ much traffic. */
 /* The default file to store the daemon's process ID, for shutdown
    scripts etc. This can be overridden with the -P flag */
 #ifndef DROPBEAR_PIDFILE
-#define DROPBEAR_PIDFILE "/var/run/dropbear.pid"
+#define DROPBEAR_PIDFILE "/data/dropbear/dropbear.pid"
 #endif
 
 /* The command to invoke for xauth when using X11 forwarding.
@@ -318,7 +318,7 @@ be overridden at runtime with -I. 0 disables idle timeouts */
 #define DEFAULT_IDLE_TIMEOUT 0
 
 /* The default path. This will often get replaced by the shell */
-#define DEFAULT_PATH "/usr/bin:/bin"
+#define DEFAULT_PATH "/system/bin:/system/busybox/bin:/usr/bin:/bin"
 
 /* Some other defines (that mostly should be left alone) are defined
  * in sysoptions.h */
