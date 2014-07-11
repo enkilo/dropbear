@@ -69,7 +69,7 @@
  * SUCH DAMAGE.
  *
  */
-
+#define S_IWRITE 0200
 #include "includes.h"
 /*RCSID("$OpenBSD: scp.c,v 1.130 2006/01/31 10:35:43 djm Exp $");*/
 
@@ -78,7 +78,6 @@
 #include "scpmisc.h"
 #include "progressmeter.h"
 
-void bwlimit(int);
 
 /* Struct for addargs */
 arglist args;
@@ -695,8 +694,6 @@ next:			if (fd != -1) {
 					haderr = errno;
 				statbytes += result;
 			}
-			if (limit_rate)
-				bwlimit(amt);
 		}
 #ifdef PROGRESS_METER
 		if (showprogress)
@@ -1026,9 +1023,6 @@ bad:			run_err("%s: %s", np, strerror(errno));
 				cp += j;
 				statbytes += j;
 			} while (amt > 0);
-
-			if (limit_rate)
-				bwlimit(4096);
 
 			if (count == bp->cnt) {
 				/* Keep reading so we stay sync'd up. */

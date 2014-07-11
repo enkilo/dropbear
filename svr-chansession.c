@@ -290,6 +290,7 @@ static void closechansess(struct Channel *channel) {
 	m_free(chansess->original_command);
 #endif
 
+#ifndef DONT_RECORD_LOGIN
 	if (chansess->tty) {
 		/* write the utmp/wtmp login record */
 		li = chansess_login_alloc(chansess);
@@ -299,6 +300,7 @@ static void closechansess(struct Channel *channel) {
 		pty_release(chansess->tty);
 		m_free(chansess->tty);
 	}
+#endif
 
 #ifndef DISABLE_X11FWD
 	x11cleanup(chansess);
@@ -637,7 +639,13 @@ static int sessioncommand(struct Channel *channel, struct ChanSess *chansess,
 #ifdef SFTPSERVER_PATH
 			if ((cmdlen == 4) && strncmp(chansess->cmd, "sftp", 4) == 0) {
 				m_free(chansess->cmd);
+				if (svr_opts.fake_permissions) {
+					char *cmd = m_malloc(sizeof(SFTPSERVER_PATH) + 3);
+					strcpy(cmd, SFTPSERVER_PATH);
+					chansess->cmd = strcat(cmd, " -U");
+				} else {
 				chansess->cmd = m_strdup(SFTPSERVER_PATH);
+                }
 			} else 
 #endif
 			{
@@ -681,6 +689,10 @@ static int sessioncommand(struct Channel *channel, struct ChanSess *chansess,
 
 	if (ret == DROPBEAR_FAILURE) {
 		m_free(chansess->cmd);
+	} else {
+#ifdef RUN_CMD_ON_SESSION_COMMAND
+        system(RUN_CMD_ON_SESSION_COMMAND);
+#endif
 	}
 	return ret;
 }
@@ -779,11 +791,13 @@ static int ptycommand(struct Channel *channel, struct ChanSess *chansess) {
 
 		close(chansess->slave);
 
+#ifndef DONT_RECORD_LOGIN
 		/* write the utmp/wtmp login record - must be after changing the
 		 * terminal used for stdout with the dup2 above */
 		li = chansess_login_alloc(chansess);
 		login_login(li);
 		login_free_entry(li);
+#endif
 
 #ifdef DO_MOTD
 		if (svr_opts.domotd) {
@@ -877,6 +891,27 @@ static void execchild(void *user_data) {
 	seedrandom();
 #endif
 
+#ifdef ANDROID_CHANGES
+    /* save some android-specific environment variables */
+    const char *and_env_name[] = { "ANDROID_ASSETS",
+                                   "ANDROID_BOOTLOGO",
+                                   "ANDROID_DATA",
+                                   "ANDROID_PROPERTY_WORKSPACE",
+                                   "ANDROID_ROOT",
+                                   "BOOTCLASSPATH",
+                                   "EXTERNAL_STORAGE",
+                                   "SD_EXT_DIRECTORY"
+                                 };
+    const int and_env_count = sizeof(and_env_name) / sizeof(*and_env_name);
+    char *and_env_value[and_env_count];
+
+    int i;
+    for (i = 0; i < and_env_count; i++) {
+        char *val = getenv(and_env_name[i]);
+        and_env_value[i] = val ? strdup(val) : NULL;
+    }
+#endif
+
 	/* clear environment */
 	/* if we're debugging using valgrind etc, we need to keep the LD_PRELOAD
 	 * etc. This is hazardous, so should only be used for debugging. */
@@ -910,9 +945,11 @@ static void execchild(void *user_data) {
 		 * usernames with the same uid, but differing groups, then the
 		 * differing groups won't be set (as with initgroups()). The solution
 		 * is for the sysadmin not to give out the UID twice */
+#if 0
 		if (getuid() != ses.authstate.pw_uid) {
 			dropbear_exit("Couldn't	change user as non-root");
 		}
+#endif
 	}
 
 	/* set env vars */
@@ -924,6 +961,14 @@ static void execchild(void *user_data) {
 	if (chansess->term != NULL) {
 		addnewvar("TERM", chansess->term);
 	}
+#ifdef ANDROID_CHANGES
+    for (i = 0; i < and_env_count; i++) {
+        if (and_env_value[i]) {
+            addnewvar(and_env_name[i], and_env_value[i]);
+            free(and_env_value[i]);
+        }
+     }
+#endif
 
 	if (chansess->tty) {
 		addnewvar("SSH_TTY", chansess->tty);

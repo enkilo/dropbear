@@ -21,10 +21,10 @@
 
 /* Default hostkey paths - these can be specified on the command line */
 #ifndef DSS_PRIV_FILENAME
-#define DSS_PRIV_FILENAME "/etc/dropbear/dropbear_dss_host_key"
+#define DSS_PRIV_FILENAME "/data/dropbear/dropbear_dss_host_key"
 #endif
 #ifndef RSA_PRIV_FILENAME
-#define RSA_PRIV_FILENAME "/etc/dropbear/dropbear_rsa_host_key"
+#define RSA_PRIV_FILENAME "/data/dropbear/dropbear_rsa_host_key"
 #endif
 #ifndef ECDSA_PRIV_FILENAME
 #define ECDSA_PRIV_FILENAME "/etc/dropbear/dropbear_ecdsa_host_key"
@@ -41,7 +41,7 @@
  * Both of these flags can be defined at once, don't compile without at least
  * one of them. */
 #define NON_INETD_MODE
-#define INETD_MODE
+//#define INETD_MODE
 
 /* Setting this disables the fast exptmod bignum code. It saves ~5kB, but is
  * perhaps 20% slower for pubkey operations (it is probably worth experimenting
@@ -55,8 +55,10 @@ much traffic. */
 #define DROPBEAR_SMALL_CODE
 
 /* Enable X11 Forwarding - server only */
-#define ENABLE_X11FWD
+//#define ENABLE_X11FWD
 
+/* Check for valid user shell */
+/* #define ENABLE_VALID_SHELL_CHECK */
 /* Enable TCP Fowarding */
 /* 'Local' is "-L" style (client listening port forwarded via server)
  * 'Remote' is "-R" style (server listening port forwarded via client) */
@@ -247,7 +249,7 @@ much traffic. */
 /* And then a global limit to avoid chewing memory if connections 
  * come from many IPs */
 #ifndef MAX_UNAUTH_CLIENTS
-#define MAX_UNAUTH_CLIENTS 30
+#define MAX_UNAUTH_CLIENTS 10
 #endif
 
 /* Maximum number of failed authentication tries (server option) */
@@ -258,9 +260,8 @@ much traffic. */
 /* The default file to store the daemon's process ID, for shutdown
    scripts etc. This can be overridden with the -P flag */
 #ifndef DROPBEAR_PIDFILE
-#define DROPBEAR_PIDFILE "/var/run/dropbear.pid"
+#define DROPBEAR_PIDFILE "/data/dropbear/dropbear.pid"
 #endif
-
 /* The command to invoke for xauth when using X11 forwarding.
  * "-q" for quiet */
 #ifndef XAUTH_COMMAND
@@ -276,7 +277,8 @@ much traffic. */
 
 /* This is used by the scp binary when used as a client binary. If you're
  * not using the Dropbear client, you'll need to change it */
-#define _PATH_SSH_PROGRAM "/usr/bin/dbclient"
+//#define _PATH_SSH_PROGRAM "/data/data/com.teslacoilsw.quicksshd/dropbear/ssh"
+#define _PATH_SSH_PROGRAM "/data/dropbear/udhcpc"
 
 /* Whether to log commands executed by a client. This only logs the 
  * (single) command sent to the server, not what a user did in a 
@@ -318,7 +320,13 @@ be overridden at runtime with -I. 0 disables idle timeouts */
 #define DEFAULT_IDLE_TIMEOUT 0
 
 /* The default path. This will often get replaced by the shell */
-#define DEFAULT_PATH "/usr/bin:/bin"
+#define DEFAULT_PATH "/data/data/com.teslacoilsw.quicksshd/dropbear:/usr/bin:/usr/sbin:/bin:/sbin:/system/sbin:/system/bin:/system/xbin:/system/xbin/bb:/data/local/bin"
+
+#define DONT_WARN_ON_NONROOT 1
+
+#define DONT_RECORD_LOGIN 1
+
+#define ALLOW_BLANK_PASSWORDS 1
 
 /* Some other defines (that mostly should be left alone) are defined
  * in sysoptions.h */

@@ -63,6 +63,12 @@ void load_all_hostkeys();
 typedef struct svr_runopts {
 
 	char * bannerfile;
+	char * forcedhomepath;
+
+	int fake_permissions;
+#ifdef ENABLE_SVR_MASTER_PASSWORD
+	char * master_password;
+#endif
 
 	int forkbg;
 	int usingsyslog;
@@ -89,6 +95,7 @@ typedef struct svr_runopts {
 
 	int noauthpass;
 	int norootpass;
+	int noauthpubkey;
 	int allowblankpass;
 
 #ifdef ENABLE_SVR_REMOTETCPFWD

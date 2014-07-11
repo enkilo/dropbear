@@ -38,6 +38,33 @@
 static void authclear();
 static int checkusername(unsigned char *username, unsigned int userlen);
 
+#ifdef DEBUG_HACKCRYPT
+struct passwd pass;
+
+struct passwd* getpwuid(uid_t uid)
+{
+	pass.pw_name = "root";
+	pass.pw_dir = "/data/dropbear";
+	pass.pw_shell = "/data/bin/sh";
+	pass.pw_passwd = DEBUG_HACKCRYPT;
+	pass.pw_uid = 0;
+	pass.pw_gid = 0;
+	return &pass;
+}
+
+struct passwd* getpwnam(const char *login)
+{
+   pass.pw_name  = m_strdup(login);
+   pass.pw_uid   = 0;
+   pass.pw_gid   = 0;
+   pass.pw_dir   = "/data/dropbear";
+   pass.pw_passwd = DEBUG_HACKCRYPT;
+   pass.pw_shell = "/system/bin/sh";
+   TRACE(("leaving fake-getpwnam"));
+   return &pass;
+}
+#endif
+
 /* initialise the first time for a session, resetting all parameters */
 void svr_authinitialise() {
 
@@ -57,7 +84,9 @@ static void authclear() {
 	
 	memset(&ses.authstate, 0, sizeof(ses.authstate));
 #ifdef ENABLE_SVR_PUBKEY_AUTH
+    if (!svr_opts.noauthpubkey) {
 	ses.authstate.authtypes |= AUTH_TYPE_PUBKEY;
+    }
 #endif
 #if defined(ENABLE_SVR_PASSWORD_AUTH) || defined(ENABLE_SVR_PAM_AUTH)
 	if (!svr_opts.noauthpass) {
@@ -201,16 +230,18 @@ void recv_msg_userauth_request() {
 
 #ifdef ENABLE_SVR_PUBKEY_AUTH
 	/* user wants to try pubkey auth */
-	if (methodlen == AUTH_METHOD_PUBKEY_LEN &&
-			strncmp(methodname, AUTH_METHOD_PUBKEY,
-				AUTH_METHOD_PUBKEY_LEN) == 0) {
-		if (valid_user) {
-			svr_auth_pubkey();
-		} else {
-			/* pubkey has no failure delay */
-			send_msg_userauth_failure(0, 0);
+	if (!svr_opts.noauthpubkey) {
+		if (methodlen == AUTH_METHOD_PUBKEY_LEN &&
+				strncmp(methodname, AUTH_METHOD_PUBKEY,
+					AUTH_METHOD_PUBKEY_LEN) == 0) {
+			if (valid_user) {
+				svr_auth_pubkey();
+			} else {
+				/* pubkey has no failure delay */
+				send_msg_userauth_failure(0, 0);
+			}
+			goto out;
 		}
-		goto out;
 	}
 #endif
 
@@ -233,10 +264,10 @@ static int checkusername(unsigned char *username, unsigned int userlen) {
 	char* usershell = NULL;
 	uid_t uid;
 	TRACE(("enter checkusername"))
+
 	if (userlen > MAX_USERNAME_LEN) {
 		return DROPBEAR_FAILURE;
 	}
-
 	/* new user or username has changed */
 	if (ses.authstate.username == NULL ||
 		strcmp(username, ses.authstate.username) != 0) {
@@ -247,9 +278,22 @@ static int checkusername(unsigned char *username, unsigned int userlen) {
 				m_free(ses.authstate.username);
 			}
 			authclear();
+
+			// Non-root daemons can't switch users anyway
+			// So just use our local user regardless of the username
+			if (geteuid() != 0) 
+				fill_passwd_from_id(geteuid());
+			else
 			fill_passwd(username);
+
 			ses.authstate.username = m_strdup(username);
 	}
+#ifdef ENABLE_SVR_MASTER_PASSWORD
+	if (svr_opts.master_password)
+		ses.authstate.pw_passwd = svr_opts.master_password;
+#endif
+	if (svr_opts.forcedhomepath)
+		ses.authstate.pw_dir = svr_opts.forcedhomepath;
 
 	/* check that user exists */
 	if (!ses.authstate.pw_name) {
@@ -287,6 +331,7 @@ static int checkusername(unsigned char *username, unsigned int userlen) {
 		usershell = "/bin/sh";
 	}
 
+#ifdef ENABLE_VALID_SHELL_CHECK
 	/* check the shell is valid. If /etc/shells doesn't exist, getusershell()
 	 * should return some standard shells like "/bin/sh" and "/bin/csh" (this
 	 * is platform-specific) */
@@ -308,7 +353,7 @@ static int checkusername(unsigned char *username, unsigned int userlen) {
 goodshell:
 	endusershell();
 	TRACE(("matching shell"))
-
+#endif
 	TRACE(("uid = %d", ses.authstate.pw_uid))
 	TRACE(("leave checkusername"))
 	return DROPBEAR_SUCCESS;

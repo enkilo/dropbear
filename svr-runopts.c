@@ -44,6 +44,7 @@ static void printhelp(const char * progname) {
 					"-b bannerfile	Display the contents of bannerfile"
 					" before user login\n"
 					"		(default: none)\n"
+          "-H homepath    Force HOME directory for all users to homepath\n"
 					"-r keyfile  Specify hostkeys (repeatable)\n"
 					"		defaults: \n"
 #ifdef DROPBEAR_DSS
@@ -68,10 +69,14 @@ static void printhelp(const char * progname) {
 					"-m		Don't display the motd on login\n"
 #endif
 					"-w		Disallow root logins\n"
+          "-U             Fake user RW permissions in SFTP\n"
 #if defined(ENABLE_SVR_PASSWORD_AUTH) || defined(ENABLE_SVR_PAM_AUTH)
 					"-s		Disable password logins\n"
 					"-g		Disable password logins for root\n"
 					"-B		Allow blank password logins\n"
+#endif
+#if defined(ENABLE_SVR_MASTER_PASSWORD)
+          "-Y password    Enable master password to any account\n"
 #endif
 #ifdef ENABLE_SVR_LOCALTCPFWD
 					"-j		Disable local port forwarding\n"
@@ -118,14 +123,20 @@ void svr_getopts(int argc, char ** argv) {
 	char* keepalive_arg = NULL;
 	char* idle_timeout_arg = NULL;
 	char* keyfile = NULL;
-
+  char* master_password_arg = NULL;
 
 	/* see printhelp() for options */
 	svr_opts.bannerfile = NULL;
+
+	svr_opts.fake_permissions = 0;
+#ifdef ENABLE_SVR_MASTER_PASSWORD
+	svr_opts.master_password = NULL;
+#endif
 	svr_opts.banner = NULL;
 	svr_opts.forkbg = 1;
 	svr_opts.norootlogin = 0;
 	svr_opts.noauthpass = 0;
+	svr_opts.noauthpubkey = 0;
 	svr_opts.norootpass = 0;
 	svr_opts.allowblankpass = 0;
 	svr_opts.inetdmode = 0;
@@ -186,6 +197,9 @@ void svr_getopts(int argc, char ** argv) {
 				case 'b':
 					next = &svr_opts.bannerfile;
 					break;
+				case 'H':
+					next = &svr_opts.forcedhomepath;
+					break;
 				case 'd':
 				case 'r':
 					next = &keyfile;
@@ -230,6 +244,17 @@ void svr_getopts(int argc, char ** argv) {
 				case 'm':
 					svr_opts.domotd = 0;
 					break;
+				case 'S':
+					svr_opts.noauthpubkey = 1;
+					break;
+				case 'U':
+					svr_opts.fake_permissions = 1;
+					break;
+#ifdef ENABLE_SVR_MASTER_PASSWORD
+				case 'Y':
+					next = &master_password_arg;
+					break;
+#endif
 #endif
 				case 'w':
 					svr_opts.norootlogin = 1;
@@ -386,6 +411,20 @@ static void disablekey(int type) {
 			break;
 		}
 	}
+	
+#ifdef ENABLE_SVR_MASTER_PASSWORD
+	if (master_password_arg) {
+		// leading $ means it's already md5ed, else md5 it.
+		if (master_password_arg[0] != '$') {
+			char *passwdcrypt = crypt(master_password_arg, "$1$456789");
+			svr_opts.master_password = m_strdup(passwdcrypt);
+		} else {
+			svr_opts.master_password = m_strdup(master_password_arg);
+		}
+        // Hide the password from ps or /proc/cmdline
+        m_burn(master_password_arg, strlen(master_password_arg));
+	}
+#endif
 }
 
 static void loadhostkey_helper(const char *name, void** src, void** dst, int fatal_duplicate) {
