@@ -6,6 +6,11 @@ if [ ! -e configure -o ! -e config.h.in ]; then
 	#autoreconf --force --verbose --foreign
 fi
 
+(cd sftp-server
+ if [ ! -e configure -o ! -e config.h.in ]; then                                                                                                                                                 
+	 ./autogen.sh
+fi)
+
 ANDROID_ARM_TOOLCHAIN=/opt/arm-linux-androideabi-4.8
 
 CC=arm-linux-androideabi-gcc
