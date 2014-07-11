@@ -3,6 +3,8 @@ if [ ! -e configure ]; then
 fi
 
 ANDROID_ARM_TOOLCHAIN=/opt/arm-linux-androideabi-4.8
+
+CC=arm-linux-androideabi-gcc
 WFLAGS="-Wall -Wno-uninitialized -Wno-unused -Wno-unused-parameter -Wno-sign-compare"
 
 PATH="$ANDROID_ARM_TOOLCHAIN/bin:$PATH"
@@ -17,8 +19,13 @@ export LDFLAGS="--sysroot $SYSROOT"
 
 CPPFLAGS="$CPPFLAGS $WFLAGS" \
 ./configure \
-	--host=arm-linux-androideabi \
+	--build=`gcc -dumpmachine` \
+	--host=`$CC -dumpmachine` \
 	--prefix=/system \
-	--disable-utmp \
+	--enable-utmp \
+	--disable-pututline \
 	--disable-utmpx \
-	--disable-lastlog
+	--disable-syslog \
+	--disable-lastlog \
+	--enable-openpty \
+	--disable-shadow
