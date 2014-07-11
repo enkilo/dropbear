@@ -51,6 +51,11 @@
 #include "sftp.h"
 #include "sftp-common.h"
 
+#ifdef __ANDROID__
+typedef long int fd_mask;
+# define howmany(x, y)  (((x) + ((y) - 1)) / (y))
+#endif
+
 /* helper */
 #define get_int64()			buffer_get_int64(&iqueue);
 #define get_int()			buffer_get_int(&iqueue);

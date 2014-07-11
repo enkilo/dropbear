@@ -162,8 +162,6 @@
 # endif
 #endif
 
-#include <openssl/opensslv.h> /* For OPENSSL_VERSION_NUMBER */
-
 #include "defines.h"
 
 #include "platform.h"

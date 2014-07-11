@@ -41,8 +41,6 @@
 
 #include "includes.h"
 
-#include <openssl/opensslv.h>
-
 #if !defined(HAVE_EVP_SHA256) && !defined(HAVE_SHA256_UPDATE) && \
     (OPENSSL_VERSION_NUMBER >= 0x00907000L)
 
