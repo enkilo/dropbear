@@ -1,3 +1,6 @@
+if [ ! -e configure ]; then
+	autoreconf
+fi
 
 ANDROID_ARM_TOOLCHAIN=/opt/arm-linux-androideabi-4.8
 WFLAGS="-Wall -Wno-uninitialized -Wno-unused -Wno-unused-parameter -Wno-sign-compare"
