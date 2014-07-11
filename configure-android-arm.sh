@@ -1,5 +1,5 @@
-if [ ! -e configure ]; then
-	autoreconf
+if [ ! -e configure -o ! -e config.h.in ]; then
+	autoreconf --force --verbose
 fi
 
 ANDROID_ARM_TOOLCHAIN=/opt/arm-linux-androideabi-4.8
