@@ -1,5 +1,5 @@
-if [ ! -e configure ]; then
-	autoreconf
+if [ ! -e configure -o ! -e config.h.in ]; then
+	autoreconf --force --verbose
 fi
 
 ANDROID_ARM_TOOLCHAIN=/opt/arm-linux-androideabi-4.8
@@ -29,3 +29,5 @@ CPPFLAGS="$CPPFLAGS $WFLAGS" \
 	--disable-lastlog \
 	--enable-openpty \
 	--disable-shadow
+
+echo "#define HAVE_OPENPTY 1" >>config.h
