@@ -627,7 +627,7 @@ static sign_key *openssh_read(const char *filename, char * UNUSED(passphrase))
 
 		if (i == 0) {
 			/* First integer is a version indicator */
-			int expected;
+			int expected = 0;
 			switch (key->type) {
 				case OSSH_RSA:
 				case OSSH_DSA:
