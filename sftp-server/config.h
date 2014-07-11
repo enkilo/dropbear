@@ -1571,4 +1571,3 @@
 #ifndef __cplusplus
 /* #undef inline */
 #endif
-#define HAVE_OPENPTY 1

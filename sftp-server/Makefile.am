@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
-bin_PROGRAMS = sftp-server
+libexec_PROGRAMS = sftp-server
 
 noinst_LIBRARIES = libopenbsd-compat.a
 
