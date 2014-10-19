@@ -7,7 +7,7 @@ ANDROID_ARM_TOOLCHAIN=/opt/arm-linux-androideabi-4.8
 CC=arm-linux-androideabi-gcc
 WFLAGS="-Wall -Wno-uninitialized -Wno-unused -Wno-unused-parameter -Wno-sign-compare"
 
-PATH="$ANDROID_ARM_TOOLCHAIN/bin:$PATH"
+#PATH="$ANDROID_ARM_TOOLCHAIN/bin:$PATH"
 
 SYSROOT=$ANDROID_NDK_ROOT/platforms/android-16/arch-arm
 export CFLAGS="--sysroot $SYSROOT"
