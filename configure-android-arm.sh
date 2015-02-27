@@ -9,7 +9,7 @@ WFLAGS="-Wall -Wno-uninitialized -Wno-unused -Wno-unused-parameter -Wno-sign-com
 
 #PATH="$ANDROID_ARM_TOOLCHAIN/bin:$PATH"
 
-SYSROOT=$ANDROID_NDK_ROOT/platforms/android-16/arch-arm
+: ${SYSROOT=$ANDROID_NDK_ROOT/platforms/android-16/arch-arm}
 export CFLAGS="--sysroot $SYSROOT"
 export LDFLAGS="--sysroot $SYSROOT"
 
