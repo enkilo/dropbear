@@ -1016,7 +1016,10 @@ void addnewvar(const char* param, const char* var) {
 	memcpy(newvar, param, plen);
 	newvar[plen] = '=';
 	memcpy(&newvar[plen+1], var, vlen);
-	newvar[plen+vlen+1] = '\0';
+	newvar[plen+vlen+2] = '\0';
+
+  dropbear_log(LOG_INFO, "Add new var '%s' = '%s'", param, var);
+
 	/* newvar is leaked here, but that's part of putenv()'s semantics */
 	if (putenv(newvar) < 0) {
 		dropbear_exit("environ error");
