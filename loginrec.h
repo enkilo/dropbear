@@ -36,7 +36,7 @@
 /* The following #defines are from OpenSSH's defines.h, required for loginrec */
 
 /* FIXME: put default paths back in */
-#define UTMP_FILE "/system/var/run/utmp"
+//#define UTMP_FILE "/system/var/run/utmp"
 #ifndef UTMP_FILE
 #  ifdef _PATH_UTMP
 #    define UTMP_FILE _PATH_UTMP
@@ -46,7 +46,7 @@
 #    endif
 #  endif
 #endif
-#define WTMP_FILE "/system/var/log/wtmp"
+//#define WTMP_FILE "/system/var/log/wtmp"
 #ifndef WTMP_FILE
 #  ifdef _PATH_WTMP
 #    define WTMP_FILE _PATH_WTMP
